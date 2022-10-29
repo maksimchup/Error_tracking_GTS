@@ -1,8 +1,33 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import mannwhitneyu
 
 
-class CusumDetector:
+class WilcoxonTest:
+    def __init__(self, n=45, m=20, alpha=0.01):
+        self.n = n
+        self.m = m
+        self.alpha = alpha
+
+    def detect(self, ts):
+        self.ts = ts
+        self.N = ts.shape[0]
+        self.err_indices = []
+
+        for i in range(self.N - self.n):
+            x = ts[i : i + self.m]
+            y = ts[i + self.m : i + self.n]
+            res = mannwhitneyu(x, y)
+
+            if res.pvalue < self.alpha:
+                self.err_indices.append(i + self.m)
+
+    def plot_result(self):
+        plt.plot(self.ts)
+        plt.plot(self.err_indices, self.ts[self.err_indices], ".r")
+
+
+class CusumTest:
     def __init__(self, climit=5, mshift=1):
         self.climit = climit
         self.mshift = mshift

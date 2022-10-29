@@ -1,5 +1,5 @@
 from net import Net, Observations, Estimatior
-from cusum import CusumDetector
+from detectors import CusumTest, WilcoxonTest
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
@@ -24,7 +24,7 @@ p_bc = 3.3139
 n_days = 10
 obs = Observations(net1)
 obs.calc_real_values(q_bc, p_bc, n_days)
-q_obs, p_obs = obs.sample(err_type="p", err_node=10, err_magnitude=1 * net1.sigma_p)
+q_obs, p_obs = obs.sample(err_type="p", err_node=10, err_magnitude=10 * net1.sigma_p)
 
 est = Estimatior(net1)
 gamma_est = np.zeros([24 * n_days, 12])
@@ -40,11 +40,11 @@ for i in range(12):
 plt.show()
 
 
-cusum = CusumDetector()
+detector = WilcoxonTest()
 for i in range(12):
     plt.subplot(4, 3, i + 1)
     plt.title(f"Pipeline {i+1}")
-    cusum.detect(gamma_est[:, i])
-    cusum.plot_result()
+    detector.detect(gamma_est[:, i])
+    detector.plot_result()
 
 plt.show()
