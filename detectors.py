@@ -3,7 +3,21 @@ import matplotlib.pyplot as plt
 from scipy.stats import mannwhitneyu
 
 
-class WilcoxonTest:
+class Detector:
+    def __init__(self):
+        pass
+
+    def detect(self, ts):
+        self.ts = ts
+        self.err_indices = []
+        return self.err_indices
+
+    def plot_result(self):
+        plt.plot(self.ts)
+        plt.plot(self.err_indices, self.ts[self.err_indices], ".r")
+
+
+class WilcoxonTest(Detector):
     def __init__(self, n=45, m=20, alpha=0.01):
         self.n = n
         self.m = m
@@ -22,12 +36,10 @@ class WilcoxonTest:
             if res.pvalue < self.alpha:
                 self.err_indices.append(i + self.m)
 
-    def plot_result(self):
-        plt.plot(self.ts)
-        plt.plot(self.err_indices, self.ts[self.err_indices], ".r")
+        return self.err_indices
 
 
-class CusumTest:
+class CusumTest(Detector):
     def __init__(self, climit=5, mshift=1):
         self.climit = climit
         self.mshift = mshift
@@ -53,9 +65,10 @@ class CusumTest:
         self.ilower = np.where(self.lowersum > self.climit)
         self.iupper = np.where(self.uppersum > self.climit)
 
-        return self.ilower, self.iupper, self.lowersum, self.uppersum
+        self.err_indices = np.union1d(self.ilower, self.iupper)
+        return self.err_indices
 
-    def plot_result(self):
+    def plot_statistics(self):
 
         plt.plot(self.lowersum, "r")
         plt.plot(self.uppersum, "b")
