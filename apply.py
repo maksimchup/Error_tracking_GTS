@@ -40,7 +40,7 @@ for i in range(12):
 plt.show()
 
 
-detector = WilcoxonTest()
+detector = CusumTest()
 for i in range(12):
     plt.subplot(4, 3, i + 1)
     plt.title(f"Pipeline {i+1}")
