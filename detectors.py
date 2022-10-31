@@ -17,6 +17,11 @@ class Detector:
         plt.plot(self.err_indices, self.ts[self.err_indices], ".r")
 
 
+class ChowTest(Detector):
+    def __init__(self, n):
+        self.n = n
+
+
 class WilcoxonTest(Detector):
     def __init__(self, n=45, m=20, alpha=0.01):
         self.n = n
