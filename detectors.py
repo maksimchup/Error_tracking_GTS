@@ -17,6 +17,12 @@ class Detector:
         plt.plot(self.err_indices, self.ts[self.err_indices], ".r")
 
 
+class ChowTest(Detector):
+    def __init__(self, n):
+        self.n = n
+        raise NotImplementedError
+
+
 class WilcoxonTest(Detector):
     def __init__(self, n=45, m=20, alpha=0.01):
         self.n = n
@@ -43,7 +49,6 @@ class CusumTest(Detector):
     def __init__(self, climit=5, mshift=1):
         self.climit = climit
         self.mshift = mshift
-
         self.ilower = []
         self.iupper = []
 
@@ -62,8 +67,8 @@ class CusumTest(Detector):
             self.lowersum[i] = min(0, L)
             self.uppersum[i] = max(0, U)
 
-        self.ilower = np.where(self.lowersum > self.climit)
-        self.iupper = np.where(self.uppersum > self.climit)
+        self.ilower = np.where(self.lowersum < -self.climit * self.dev)
+        self.iupper = np.where(self.uppersum > self.climit * self.dev)
 
         self.err_indices = np.union1d(self.ilower, self.iupper)
         return self.err_indices

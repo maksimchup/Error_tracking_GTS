@@ -1,5 +1,6 @@
-from net import Net, Observations, Estimatior
-from detectors import CusumTest, WilcoxonTest
+from net import Net, Observations
+import estimators
+import detectors
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
@@ -22,29 +23,21 @@ q_bc = np.array(
 )
 p_bc = 3.3139
 n_days = 10
+err_magnitude = 0.05
+
 obs = Observations(net1)
 obs.calc_real_values(q_bc, p_bc, n_days)
-q_obs, p_obs = obs.sample(err_type="p", err_node=10, err_magnitude=10 * net1.sigma_p)
+q_obs, p_obs = obs.sample(err_type="p", err_node=10, err_magnitude=err_magnitude)
 
-est = Estimatior(net1)
-gamma_est = np.zeros([24 * n_days, 12])
-
+coef_est = np.zeros(24 * n_days)
+est = estimators.Est_mu(net1)
 for t in range(24 * n_days):
-    gamma_est[t, :] = est.calc_gamma(q_obs[t], p_obs[t])
+    coef_est[t] = est.get_coef(q_obs[t], p_obs[t])
 
-for i in range(12):
-    plt.subplot(4, 3, i + 1)
-    plt.title(f"Pipeline {i+1}")
-    plt.plot(gamma_est[:, i])
-
+detector = detectors.CusumTest()
+detector.detect(coef_est)
+detector.plot_result()
 plt.show()
 
-
-detector = WilcoxonTest()
-for i in range(12):
-    plt.subplot(4, 3, i + 1)
-    plt.title(f"Pipeline {i+1}")
-    detector.detect(gamma_est[:, i])
-    detector.plot_result()
-
+detector.plot_statistics()
 plt.show()
